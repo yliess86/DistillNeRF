@@ -1,0 +1,533 @@
+@InProceedings{Mildenhall2020,
+    author="Mildenhall, Ben and Srinivasan, Pratul P. and Tancik, Matthew and Barron, Jonathan T. and Ramamoorthi, Ravi and Ng, Ren",
+    editor="Vedaldi, Andrea and Bischof, Horst and Brox, Thomas and Frahm, Jan-Michael",
+    title="NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis",
+    booktitle="Computer Vision -- ECCV 2020",
+    year="2020",
+    publisher="Springer International Publishing",
+    address="Cham",
+    pages="405--421",
+    abstract="We present a method that achieves state-of-the-art results for synthesizing novel views of complex scenes by optimizing an underlying continuous volumetric scene function using a sparse set of input views. Our algorithm represents a scene using a fully-connected (non-convolutional) deep network, whose input is a single continuous 5D coordinate (spatial location (x, y, z) and viewing direction {\$}{\$}({\backslash}theta ,{\backslash}phi ){\$}{\$}) and whose output is the volume density and view-dependent emitted radiance at that spatial location. We synthesize views by querying 5D coordinates along camera rays and use classic volume rendering techniques to project the output colors and densities into an image. Because volume rendering is naturally differentiable, the only input required to optimize our representation is a set of images with known camera poses. We describe how to effectively optimize neural radiance fields to render photorealistic novel views of scenes with complicated geometry and appearance, and demonstrate results that outperform prior work on neural rendering and view synthesis. View synthesis results are best viewed as videos, so we urge readers to view our supplementary video for  convincing comparisons.",
+    isbn="978-3-030-58452-8"
+}
+
+@InProceedings{Schonberger2016,
+    author={Schonberger, Johannes L. and Frahm, Jan-Michael},
+    title={Structure-From-Motion Revisited},
+    booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month={June},
+    year={2016}
+}
+
+@InProceedings{Song2020,
+    author={Zhenbo Song and Wayne Chen and Dylan Campbell and Hongdong Li},
+    editor={Andrea Vedaldi and Horst Bischof and Thomas Brox and Jan{-}Michael Frahm},
+    title={Deep Novel View Synthesis from Colored 3D Point Clouds},
+    booktitle={Computer Vision - {ECCV} 2020 - 16th European Conference, Glasgow, UK, August 23-28, 2020, Proceedings, Part {XXIV}},
+    series={Lecture Notes in Computer Science},
+    volume={12369},
+    pages={1--17},
+    publisher={Springer},
+    year={2020},
+    url={https://doi.org/10.1007/978-3-030-58586-0\_1},
+    doi={10.1007/978-3-030-58586-0\_1},
+    timestamp={Mon, 30 Nov 2020 17:53:53 +0100},
+    biburl={https://dblp.org/rec/conf/eccv/SongCCL20.bib},
+    bibsource={dblp computer science bibliography, https://dblp.org}
+}
+
+@InProceedings{Riegler2020,
+    title={Free view synthesis},
+    author={Riegler, Gernot and Koltun, Vladlen},
+    booktitle={European Conference on Computer Vision},
+    pages={623--640},
+    year={2020},
+    organization={Springer}
+}
+
+@InProceedings{Aliev2020,
+    author="Aliev, Kara-Ali and Sevastopolsky, Artem and Kolos, Maria and Ulyanov, Dmitry and Lempitsky, Victor",
+    editor="Vedaldi, Andrea and Bischof, Horst and Brox, Thomas and Frahm, Jan-Michael",
+    title="Neural Point-Based Graphics",
+    booktitle="Computer Vision -- ECCV 2020",
+    year="2020",
+    publisher="Springer International Publishing",
+    address="Cham",
+    pages="696--712",
+    abstract="We present a new point-based approach for modeling the appearance of real scenes. The approach uses a raw point cloud as the geometric representation of a scene, and augments each point with a learnable neural descriptor that encodes local geometry and appearance. A deep rendering network is learned in parallel with the descriptors, so that new views of the scene can be obtained by passing the rasterizations of a point cloud from new viewpoints through this network. The input rasterizations use the learned descriptors as point pseudo-colors. We show that the proposed approach can be used for modeling complex scenes and obtaining their photorealistic views, while avoiding explicit surface estimation and meshing. In particular, compelling results are obtained for scenes scanned using hand-held commodity RGB-D sensors as well as standard RGB cameras even in the presence of objects that are challenging for standard mesh-based modeling.",
+    isbn="978-3-030-58542-6"
+}
+
+@Article{Li2021,
+    title={Neural 3D Video Synthesis},
+    author={Li, Tianye and Slavcheva, Mira and Zollhoefer, Michael and Green, Simon and Lassner, Christoph and Kim, Changil and Schmidt, Tanner and Lovegrove, Steven and Goesele, Michael and Lv, Zhaoyang},
+    journal={arXiv e-prints},
+    pages={arXiv--2103},
+    year={2021}
+}
+
+@Article{Zhang2021,
+    title={Editable free-viewpoint video using a layered neural representation},
+    author={Zhang, Jiakai and Liu, Xinhang and Ye, Xinyi and Zhao, Fuqiang and Zhang, Yanshun and Wu, Minye and Zhang, Yingliang and Xu, Lan and Yu, Jingyi},
+    journal={ACM Transactions on Graphics (TOG)},
+    volume={40},
+    number={4},
+    pages={1--18},
+    year={2021},
+    publisher={ACM New York, NY, USA}
+}
+
+@InProceedings{Gafni2021,
+    title={Dynamic neural radiance fields for monocular 4d facial avatar reconstruction},
+    author={Gafni, Guy and Thies, Justus and Zollhofer, Michael and Nie{\ss}ner, Matthias},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={8649--8658},
+    year={2021}
+}
+
+@Article{Xu2021,
+    title={H-nerf: Neural radiance fields for rendering and temporal reconstruction of humans in motion},
+    author={Xu, Hongyi and Alldieck, Thiemo and Sminchisescu, Cristian},
+    journal={Advances in Neural Information Processing Systems},
+    volume={34},
+    year={2021}
+}
+
+@inproceedings{Rebain2021,
+    title={Derf: Decomposed radiance fields},
+    author={Rebain, Daniel and Jiang, Wei and Yazdani, Soroosh and Li, Ke and Yi, Kwang Moo and Tagliasacchi, Andrea},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={14153--14161},
+    year={2021}
+}
+
+@Article{Liu2020,
+    title={Neural sparse voxel fields},
+    author={Liu, Lingjie and Gu, Jiatao and Lin, Kyaw Zaw and Chua, Tat-Seng and Theobalt, Christian},
+    journal={arXiv preprint arXiv:2007.11571},
+    year={2020}
+}
+
+@Article{Reiser2021,
+    title={KiloNeRF: Speeding up Neural Radiance Fields with Thousands of Tiny MLPs},
+    author={Reiser, Christian and Peng, Songyou and Liao, Yiyi and Geiger, Andreas},
+    journal={arXiv preprint arXiv:2103.13744},
+    year={2021}
+}
+
+@Article{Hedman2021,
+    title={Baking Neural Radiance Fields for Real-Time View Synthesis},
+    author={Hedman, Peter and Srinivasan, Pratul P and Mildenhall, Ben and Barron, Jonathan T and Debevec, Paul},
+    journal={arXiv preprint arXiv:2103.14645},
+    year={2021}
+}
+
+@Article{Yu2021,
+    title={Plenoctrees for real-time rendering of neural radiance fields},
+    author={Yu, Alex and Li, Ruilong and Tancik, Matthew and Li, Hao and Ng, Ren and Kanazawa, Angjoo},
+    journal={arXiv preprint arXiv:2103.14024},
+    year={2021}
+}
+
+@Article{Neff2021,
+    title={DONeRF: Towards Real-Time Rendering of Compact Neural Radiance Fields using Depth Oracle Networks},
+    author={Neff, Thomas and Stadlbauer, Pascal and Parger, Mathias and Kurz, Andreas and Mueller, Joerg H and Chaitanya, Chakravarty R Alla and Kaplanyan, Anton and Steinberger, Markus},
+    journal={arXiv preprint arXiv:2103.03231},
+    year={2021}
+}
+
+@Article{Arandjelovic2021,
+    title={NeRF in detail: Learning to sample for view synthesis},
+    author={Arandjelovi{\'c}, Relja and Zisserman, Andrew},
+    journal={arXiv preprint arXiv:2106.05264},
+    year={2021}
+}
+
+@Article{Garbin2021,
+    title={Fastnerf: High-fidelity neural rendering at 200fps},
+    author={Garbin, Stephan J and Kowalski, Marek and Johnson, Matthew and Shotton, Jamie and Valentin, Julien},
+    journal={arXiv preprint arXiv:2103.10380},
+    year={2021}
+}
+
+@InProceedings{Buehler2001,
+    author={Buehler, Chris and Bosse, Michael and McMillan, Leonard and Gortler, Steven and Cohen, Michael},
+    title={Unstructured Lumigraph Rendering},
+    year={2001},
+    isbn={158113374X},
+    publisher={Association for Computing Machinery},
+    address={New York, NY, USA},
+    url={https://doi.org/10.1145/383259.383309},
+    doi={10.1145/383259.383309},
+    abstract={We describe an image based rendering approach that generalizes many current image based rendering algorithms, including light field rendering and view-dependent texture mapping. In particular, it allows for lumigraph-style rendering from a set of input cameras in arbitrary configurations (i.e., not restricted to a plane or to any specific manifold). In the case of regular and planar input camera positions, our algorithm reduces to a typical lumigraph approach. When presented with fewer cameras and good approximate geometry, our algorithm behaves like view-dependent texture mapping. The algorithm achieves this flexibility because it is designed to meet a set of specific goals that we describe. We demonstrate this flexibility with a variety of examples.},
+    booktitle={Proceedings of the 28th Annual Conference on Computer Graphics and Interactive Techniques},
+    pages={425–432},
+    numpages={8},
+    keywords={image-based rendering},
+    series={SIGGRAPH '01}
+}
+
+@InProceedings{Debevec1996,
+    author={Debevec, Paul E. and Taylor, Camillo J. and Malik, Jitendra},
+    title={Modeling and Rendering Architecture from Photographs: A Hybrid Geometry- and Image-Based Approach},
+    year={1996},
+    isbn={0897917464},
+    publisher={Association for Computing Machinery},
+    address={New York, NY, USA},
+    url={https://doi.org/10.1145/237170.237191},
+    doi={10.1145/237170.237191},
+    booktitle={Proceedings of the 23rd Annual Conference on Computer Graphics and Interactive Techniques},
+    pages={11–20},
+    numpages={10},
+    series={SIGGRAPH '96}
+}
+
+@InProceedings{Waechter2014,
+    title={Let There Be Color! Large-Scale Texturing of 3D Reconstructions},
+    author={Michael Waechter and Nils Moehrle and Michael Goesele},
+    booktitle={ECCV},
+    year={2014}
+}
+
+@InProceedings{Wood2000,
+    author={Wood, Daniel N. and Azuma, Daniel I. and Aldinger, Ken and Curless, Brian and Duchamp, Tom and Salesin, David H. and Stuetzle, Werner},
+    title={Surface Light Fields for 3D Photography},
+    year={2000},
+    isbn={1581132085},
+    publisher={ACM Press/Addison-Wesley Publishing Co.},
+    address={USA},
+    url={https://doi.org/10.1145/344779.344925},
+    doi={10.1145/344779.344925},
+    abstract={A surface light field is a function that assigns a color to each ray originating on a surface. Surface light fields are well suited to constructing virtual images of shiny objects under complex lighting conditions. This paper presents a framework for construction, compression, interactive rendering, and rudimentary editing of surface light fields of real objects. Generalization of vector quantization and principal component analysis are used to construct a compressed representation of an object's surface light field from photographs and range scans. A new rendering algorithm achieves interactive rendering of images from the compressed representation, incorporating view-dependent geometric level-of-detail control. The surface light field representation can also be directly edited to yield plausible surface light fields for small changes in surface geometry and reflectance properties.},
+    booktitle={Proceedings of the 27th Annual Conference on Computer Graphics and Interactive Techniques},
+    pages={287–296},
+    numpages={10},
+    keywords={light field, function quantization, surface light fields, wavelets, 3D photography, principal function analysis, image-based rendering, view-dependent level-of-detail, lumigraph},
+    series={SIGGRAPH '00}
+}
+
+@InProceedings{Flynn2019,
+    title={Deepview: View synthesis with learned gradient descent},
+    author={Flynn, John and Broxton, Michael and Debevec, Paul and DuVall, Matthew and Fyffe, Graham and Overbeck, Ryan and Snavely, Noah and Tucker, Richard},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={2367--2376},
+    year={2019}
+}
+
+@Article{Mildenhall2019,
+    author={Mildenhall, Ben and Srinivasan, Pratul P. and Ortiz-Cayon, Rodrigo and Kalantari, Nima Khademi and Ramamoorthi, Ravi and Ng, Ren and Kar, Abhishek},
+    title={Local Light Field Fusion: Practical View Synthesis with Prescriptive Sampling Guidelines},
+    year={2019},
+    issue_date={August 2019},
+    publisher={Association for Computing Machinery},
+    address={New York, NY, USA},
+    volume={38},
+    number={4},
+    issn={0730-0301},
+    url={https://doi.org/10.1145/3306346.3322980},
+    doi={10.1145/3306346.3322980},
+    abstract={We present a practical and robust deep learning solution for capturing and rendering novel views of complex real world scenes for virtual exploration. Previous approaches either require intractably dense view sampling or provide little to no guidance for how users should sample views of a scene to reliably render high-quality novel views. Instead, we propose an algorithm for view synthesis from an irregular grid of sampled views that first expands each sampled view into a local light field via a multiplane image (MPI) scene representation, then renders novel views by blending adjacent local light fields. We extend traditional plenoptic sampling theory to derive a bound that specifies precisely how densely users should sample views of a given scene when using our algorithm. In practice, we apply this bound to capture and render views of real world scenes that achieve the perceptual quality of Nyquist rate view sampling while using up to 4000X fewer views. We demonstrate our approach's practicality with an augmented reality smart-phone app that guides users to capture input images of a scene and viewers that enable realtime virtual exploration on desktop and mobile platforms.},
+    journal={ACM Trans. Graph.},
+    month={jul},
+    articleno={29},
+    numpages={14},
+    keywords={plenoptic sampling, image-based rendering, view synthesis, light fields, deep learning}
+}
+
+@InProceedings{Srinivasan2020,
+    title={Lighthouse: Predicting lighting volumes for spatially-coherent illumination},
+    author={Srinivasan, Pratul P and Mildenhall, Ben and Tancik, Matthew and Barron, Jonathan T and Tucker, Richard and Snavely, Noah},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={8080--8089},
+    year={2020}
+}
+
+@InProceedings{Srinivasan2019,
+    title={Pushing the boundaries of view extrapolation with multiplane images},
+    author={Srinivasan, Pratul P and Tucker, Richard and Barron, Jonathan T and Ramamoorthi, Ravi and Ng, Ren and Snavely, Noah},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={175--184},
+    year={2019}
+}
+
+@InProceedings{Tucker2020,
+    title={Single-view view synthesis with multiplane images},
+    author={Tucker, Richard and Snavely, Noah},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={551--560},
+    year={2020}
+}
+
+@Article{Zhou2018,
+    title={Stereo magnification: Learning view synthesis using multiplane images},
+    author={Zhou, Tinghui and Tucker, Richard and Flynn, John and Fyffe, Graham and Snavely, Noah},
+    journal={arXiv preprint arXiv:1805.09817},
+    year={2018}
+}
+
+@InProceedings{Kutulakos1999,
+    author={Kutulakos, K.N. and Seitz, S.M.},
+    booktitle={Proceedings of the Seventh IEEE International Conference on Computer Vision}, 
+    title={A theory of shape by space carving}, 
+    year={1999},
+    volume={1},
+    number={},
+    pages={307-314 vol.1},
+    doi={10.1109/ICCV.1999.791235}
+}
+
+@Article{Lombardi2019,
+    author={Lombardi, Stephen and Simon, Tomas and Saragih, Jason and Schwartz, Gabriel and Lehrmann, Andreas and Sheikh, Yaser},
+    title={Neural Volumes: Learning Dynamic Renderable Volumes from Images},
+    year={2019},
+    issue_date={August 2019},
+    publisher={Association for Computing Machinery},
+    address={New York, NY, USA},
+    volume={38},
+    number={4},
+    issn={0730-0301},
+    url={https://doi.org/10.1145/3306346.3323020},
+    doi={10.1145/3306346.3323020},
+    abstract={Modeling and rendering of dynamic scenes is challenging, as natural scenes often contain complex phenomena such as thin structures, evolving topology, translucency, scattering, occlusion, and biological motion. Mesh-based reconstruction and tracking often fail in these cases, and other approaches (e.g., light field video) typically rely on constrained viewing conditions, which limit interactivity. We circumvent these difficulties by presenting a learning-based approach to representing dynamic objects inspired by the integral projection model used in tomographic imaging. The approach is supervised directly from 2D images in a multi-view capture setting and does not require explicit reconstruction or tracking of the object. Our method has two primary components: an encoder-decoder network that transforms input images into a 3D volume representation, and a differentiable ray-marching operation that enables end-to-end training. By virtue of its 3D representation, our construction extrapolates better to novel viewpoints compared to screen-space rendering techniques. The encoder-decoder architecture learns a latent representation of a dynamic scene that enables us to produce novel content sequences not seen during training. To overcome memory limitations of voxel-based representations, we learn a dynamic irregular grid structure implemented with a warp field during ray-marching. This structure greatly improves the apparent resolution and reduces grid-like artifacts and jagged motion. Finally, we demonstrate how to incorporate surface-based representations into our volumetric-learning framework for applications where the highest resolution is required, using facial performance capture as a case in point.},
+    journal={ACM Trans. Graph.},
+    month={jul},
+    articleno={65},
+    numpages={14},
+    keywords={volume warping, differentiable ray marching, volumetric rendering, ray potentials}
+}
+
+@Article{Penner2017,
+    author={Penner, Eric and Zhang, Li},
+    title={Soft 3D Reconstruction for View Synthesis},
+    year={2017},
+    issue_date={December 2017},
+    publisher={Association for Computing Machinery},
+    address={New York, NY, USA},
+    volume={36},
+    number={6},
+    issn={0730-0301},
+    url={https://doi.org/10.1145/3130800.3130855},
+    doi={10.1145/3130800.3130855},
+    abstract={We present a novel algorithm for view synthesis that utilizes a soft 3D reconstruction to improve quality, continuity and robustness. Our main contribution is the formulation of a soft 3D representation that preserves depth uncertainty through each stage of 3D reconstruction and rendering. We show that this representation is beneficial throughout the view synthesis pipeline. During view synthesis, it provides a soft model of scene geometry that provides continuity across synthesized views and robustness to depth uncertainty. During 3D reconstruction, the same robust estimates of scene visibility can be applied iteratively to improve depth estimation around object edges. Our algorithm is based entirely on O(1) filters, making it conducive to acceleration and it works with structured or unstructured sets of input views. We compare with recent classical and learning-based algorithms on plenoptic lightfields, wide baseline captures, and lightfield videos produced from camera arrays.},
+    journal={ACM Trans. Graph.},
+    month={nov},
+    articleno={235},
+    numpages={11},
+    keywords={view synthesis, 3D reconstruction}
+}
+
+@InProceedings{Seitz1997,
+    author={Seitz, S.M. and Dyer, C.R.},
+    booktitle={Proceedings of IEEE Computer Society Conference on Computer Vision and Pattern Recognition}, 
+    title={Photorealistic scene reconstruction by voxel coloring}, 
+    year={1997},
+    volume={},
+    number={},
+    pages={1067-1073},
+    doi={10.1109/CVPR.1997.609462}
+}
+
+@InProceedings{Sitzmann2019,
+    title={Deepvoxels: Learning persistent 3d feature embeddings},
+    author={Sitzmann, Vincent and Thies, Justus and Heide, Felix and Nie{\ss}ner, Matthias and Wetzstein, Gordon and Zollhofer, Michael},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={2437--2446},
+    year={2019}
+}
+
+@InProceedings{Szeliski1998,
+    author={Szeliski, R. and Golland, P.},
+    booktitle={Sixth International Conference on Computer Vision (IEEE Cat. No.98CH36271)}, 
+    title={Stereo matching with transparency and matting}, 
+    year={1998},
+    volume={},
+    number={},
+    pages={517-524},
+    doi={10.1109/ICCV.1998.710766}
+}
+
+@InProceedings{Niemeyer2020,
+    title={Differentiable Volumetric Rendering: Learning Implicit 3D Representations without 3D Supervision},
+    author={Niemeyer, Michael and Mescheder, Lars and Oechsle, Michael and Geiger, Andreas},
+    booktitle={ Proceedings IEEE Conf. on Computer Vision and Pattern Recognition (CVPR)},
+    year={2020},
+    doi={}
+}
+
+@inproceedings{Park2020,
+    title={Latentfusion: End-to-end differentiable reconstruction and rendering for unseen object pose estimation},
+    author={Park, Keunhong and Mousavian, Arsalan and Xiang, Yu and Fox, Dieter},
+    booktitle={Proceedings of the IEEE/CVF conference on computer vision and pattern recognition},
+    pages={10710--10719},
+    year={2020}
+}
+
+@Article{Yariv2020,
+    title={Multiview neural surface reconstruction by disentangling geometry and appearance},
+    author={Yariv, Lior and Kasten, Yoni and Moran, Dror and Galun, Meirav and Atzmon, Matan and Basri, Ronen and Lipman, Yaron},
+    journal={arXiv preprint arXiv:2003.09852},
+    year={2020}
+}
+
+@Article{Liu2019,
+    title={Soft rasterizer: Differentiable rendering for unsupervised single-view mesh reconstruction},
+    author={Liu, Shichen and Chen, Weikai and Li, Tianye and Li, Hao},
+    journal={arXiv preprint arXiv:1901.05567},
+    year={2019}
+}
+
+@InProceedings{Liu2020b,
+    title={Dist: Rendering deep implicit signed distance function with differentiable sphere tracing},
+    author={Liu, Shaohui and Zhang, Yinda and Peng, Songyou and Shi, Boxin and Pollefeys, Marc and Cui, Zhaopeng},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={2019--2028},
+    year={2020}
+}
+
+@InProceedings{Park2019,
+    title={Deepsdf: Learning continuous signed distance functions for shape representation},
+    author={Park, Jeong Joon and Florence, Peter and Straub, Julian and Newcombe, Richard and Lovegrove, Steven},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={165--174},
+    year={2019}
+}
+
+@Article{Chibane2020,
+    title={Neural unsigned distance fields for implicit function learning},
+    author={Chibane, Julian and Mir, Aymen and Pons-Moll, Gerard},
+    journal={arXiv preprint arXiv:2010.13938},
+    year={2020}
+}
+
+@InProceedings{Tancik2021,
+    title={Learned initializations for optimizing coordinate-based neural representations},
+    author={Tancik, Matthew and Mildenhall, Ben and Wang, Terrance and Schmidt, Divi and Srinivasan, Pratul P and Barron, Jonathan T and Ng, Ren},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={2846--2855},
+    year={2021}
+}
+
+@Article{Barron2021,
+    title={Mip-NeRF: A Multiscale Representation for Anti-Aliasing Neural Radiance Fields},
+    author={Barron, Jonathan T and Mildenhall, Ben and Tancik, Matthew and Hedman, Peter and Martin-Brualla, Ricardo and Srinivasan, Pratul P},
+    journal={arXiv preprint arXiv:2103.13415},
+    year={2021}
+}
+
+@Article{Zhang2020,
+    title={Nerf++: Analyzing and improving neural radiance fields},
+    author={Zhang, Kai and Riegler, Gernot and Snavely, Noah and Koltun, Vladlen},
+    journal={arXiv preprint arXiv:2010.07492},
+    year={2020}
+}
+
+@InProceedings{Martin2021,
+    title={Nerf in the wild: Neural radiance fields for unconstrained photo collections},
+    author={Martin-Brualla, Ricardo and Radwan, Noha and Sajjadi, Mehdi SM and Barron, Jonathan T and Dosovitskiy, Alexey and Duckworth, Daniel},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={7210--7219},
+    year={2021}
+}
+
+@Article{Mildenhall2021,
+    title={NeRF in the Dark: High Dynamic Range View Synthesis from Noisy Raw Images},
+    author={Mildenhall, Ben and Hedman, Peter and Martin-Brualla, Ricardo and Srinivasan, Pratul and Barron, Jonathan T},
+    journal={arXiv preprint arXiv:2111.13679},
+    year={2021}
+}
+
+@Article{Jain2021,
+    title={Zero-Shot Text-Guided Object Generation with Dream Fields},
+    author={Jain, Ajay and Mildenhall, Ben and Barron, Jonathan T and Abbeel, Pieter and Poole, Ben},
+    journal={arXiv preprint arXiv:2112.01455},
+    year={2021}
+}
+
+@InProceedings{Srinivasan2021,
+    title={Nerv: Neural reflectance and visibility fields for relighting and view synthesis},
+    author={Srinivasan, Pratul P and Deng, Boyang and Zhang, Xiuming and Tancik, Matthew and Mildenhall, Ben and Barron, Jonathan T},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={7495--7504},
+    year={2021}
+}
+
+@Article{Athar2021,
+    title={Flame-in-nerf: Neural control of radiance fields for free view face animation},
+    author={Athar, ShahRukh and Shu, Zhixin and Samaras, Dimitris},
+    journal={arXiv preprint arXiv:2108.04913},
+    year={2021}
+}
+
+@Article{Su2021,
+    title={A-nerf: Articulated neural radiance fields for learning human shape, appearance, and pose},
+    author={Su, Shih-Yang and Yu, Frank and Zollh{\"o}fer, Michael and Rhodin, Helge},
+    journal={Advances in Neural Information Processing Systems},
+    volume={34},
+    year={2021}
+}
+
+@Article{Guo2021,
+    title={Template NeRF: Towards Modeling Dense Shape Correspondences from Category-Specific Object Images},
+    author={Guo, Jianfei and Yang, Zhiyuan and Lin, Xi and Zhang, Qingfu},
+    journal={arXiv preprint arXiv:2111.04237},
+    year={2021}
+}
+
+@InProceedings{Jang2021,
+    title={Codenerf: Disentangled neural radiance fields for object categories},
+    author={Jang, Wonbong and Agapito, Lourdes},
+    booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+    pages={12949--12958},
+    year={2021}
+}
+
+@Article{Yen2020,
+    title={inerf: Inverting neural radiance fields for pose estimation},
+    author={Yen-Chen, Lin and Florence, Pete and Barron, Jonathan T and Rodriguez, Alberto and Isola, Phillip and Lin, Tsung-Yi},
+    journal={arXiv preprint arXiv:2012.05877},
+    year={2020}
+}
+
+@InProceedings{Saito2019,
+    title={Pifu: Pixel-aligned implicit function for high-resolution clothed human digitization},
+    author={Saito, Shunsuke and Huang, Zeng and Natsume, Ryota and Morishima, Shigeo and Kanazawa, Angjoo and Li, Hao},
+    booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+    pages={2304--2314},
+    year={2019}
+}
+
+@InProceedings{Boss2021,
+    title={Nerd: Neural reflectance decomposition from image collections},
+    author={Boss, Mark and Braun, Raphael and Jampani, Varun and Barron, Jonathan T and Liu, Ce and Lensch, Hendrik},
+    booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+    pages={12684--12694},
+    year={2021}
+}
+
+@Article{Zhang2021b,
+    title={NeRFactor: Neural Factorization of Shape and Reflectance Under an Unknown Illumination},
+    author={Zhang, Xiuming and Srinivasan, Pratul P and Deng, Boyang and Debevec, Paul and Freeman, William T and Barron, Jonathan T},
+    journal={arXiv preprint arXiv:2106.01970},
+    year={2021}
+}
+
+@Article{Rudnev2021,
+    title={Neural Radiance Fields for Outdoor Scene Relighting},
+    author={Rudnev, Viktor and Elgharib, Mohamed and Smith, William and Liu, Lingjie and Golyanik, Vladislav and Theobalt, Christian},
+    journal={arXiv preprint arXiv:2112.05140},
+    year={2021}
+}
+
+@Article{Nichol2018,
+    title={On first-order meta-learning algorithms},
+    author={Nichol, Alex and Achiam, Joshua and Schulman, John},
+    journal={arXiv preprint arXiv:1803.02999},
+    year={2018}
+}
+
+@Article{Tancik2020,
+    title={Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains},
+    author={Matthew Tancik and Pratul P. Srinivasan and Ben Mildenhall and Sara Fridovich-Keil and Nithin Raghavan and Utkarsh Singhal and Ravi Ramamoorthi and Jonathan T. Barron and Ren Ng},
+    journal={NeurIPS},
+    year={2020}
+}

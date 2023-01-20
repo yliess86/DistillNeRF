@@ -1,0 +1,298 @@
+\glsresetall
+\section{Introduction}
+
+\paragraph{Motivation}
+\gls{NVS} is a challenging problem for Computer Science as it requires an understanding of the 3D scene structure, image reasoning, and a method to render its internal representation into target viewpoints. Current advances in Deep Learning allowed neural approaches to gain popularity and enabled applications that were impossible to achieve without a significant loss in quality. Neural \gls{NVS} is becoming crucial to graphics pipeline based on real-world imagery such as image/video viewpoint editing \citeColored{Li2021,Zhang2021} and photorealistic facial puppetry in \gls{VR} chat applications \citeColored{Gafni2021,Xu2021}. To this end, \gls{NeRF} \citeColored{Mildenhall2020}, learns a compact continuous 3D implicit representation of the scene and can generate high-quality novel views while dealing with thin, semi-transparent, and reflective surfaces.
+
+\paragraph{Problem}
+\gls{NeRF} optimizes a large capacity \gls{MLP} to regress a volume density and view-dependent RGB color from a 5D coordinate $(x,y, z,\theta,\phi)$. In the vanilla implementation, \gls{NeRF} uses two neural networks to perform a hierarchical sampling of the scene, a coarse for approximating the geometry and a fine to refine this prediction.
+
+While this formulation of neural \gls{NVS} allows unprecedented render quality, it suffers from long training times, $X hours$ on average, and long inference times $X s$ per frame, thus failing at providing real-time use-cases. these factors can be explained by the number of network queries needed to render a frame and by \gls{NeRF}'s two large capacity internal neural networks. Reducing both factors often results in lower quality renders and cannot be done without additional countermeasures. While the current literature has focused on reducing the number of queries \citeColored{Neff2021,Arandjelovic2021} and the use of render acceleration structures \citeColored{Rebain2021,Liu2020,Reiser2021,Hedman2021,Yu2021,Garbin2021}, this paper explores how to minimize \gls{NeRF}'s training time and network capacity while limiting the quality loss.
+
+\paragraph{Solution}
+We introduce DistillNeRF, a data-efficient method to breed lower capacity \gls{NeRF} models using \gls{KD}. DistillNerF uses only one network for both coarse and fine steps, naturally reducing the number of network queries and diving memory usage by half. Our method relies on extracting a priority voxel grid from a pretrained model (teacher) to generate better data samples for training a lower capacity model (student) and reduce the quality loss.
+
+\paragraph{Findings}
+We evaluate DistillNeRF on the synthetic \gls{NVS} Blender benchmark proposed in the original work by distilling three flavors of \gls{NeRF} students we named TinyNeRF, MicroNeRF, and NanoNeRF in decreasing order of depth and wideness. We reduced the quality loss of \gls{KD} by $X$ on PSNR, $X$ on SSIM, and $X$ on LPIPS, reported up to $factorX$ faster rendering, and reduced training time by $X$, $X$ for \gls{KD}, using half the memory.
+
+\paragraph{Contributions}
+To summarize, our contributions are:
+\begin{itemize}
+    \item We present DistillNeRF, a data-efficient method to breed lower capacity \gls{NeRF} models using \gls{KD} and report reduced training time, inference time, memory usage, and quality loss induced by the \gls{KD}.
+    \item We compare three flavors of distilled NeRF students: TinyNeRF, MicroNeRF, and NanoNeRF against NeRF's standard training procedure on a synthetic Blender benchmark.
+    \item We implemented an open-source C++ renderer using LibTorch, Cuda kernels, and OpenGL textures to avoid memory transfers between the RAM and the VRAM.
+\end{itemize}
+
+\paragraph{Implication}
+DistillNeRF is orthogonal to previous work and can be used in conjunction with sample reduction methods and acceleration structures. Improving \gls{NeRF} inference and rendering speed enable the use of \gls{NVS} for real-time applications on consumer-grade hardware.
+
+\paragraph{Reproduction}
+For replicability and transparency, we published our implementation and experimentations at \url{https://github.com/yliess86/DistillNeRF}.
+
+% =============================================
+\begin{figure*}[ht]
+    \includegraphics[width=\textwidth]{imgs/teaser.png}
+    \caption{Architectures figure}
+    \label{fig:architectures}
+\end{figure*}
+
+% =============================================
+\glsresetall
+\section{Related Work}
+
+\paragraph{Novel View Synthesis}
+
+As often in \gls{CG}, \gls{NVS} methods can be compared by their choice of geometry representation and rendering method.
+
+Mesh \citeColored{Buehler2001,Debevec1996,Waechter2014,Wood2000} and point-cloud \citeColored{Schonberger2016,Song2020,Riegler2020,Aliev2020} methods relies on preprocessing steps such as \gls{SfM} or RGB-D sensors to reconstruct scene geometry from multi-view images. \gls{MPI} approaches \citeColored{Flynn2019,Mildenhall2019,Srinivasan2020,Srinivasan2019,Tucker2020,Zhou2018} represents the scene as a sucession of image layers allowing for high-quality renders of low range viewpoint displacements. Voxel-based methods \citeColored{Kutulakos1999,Lombardi2019,Penner2017,Seitz1997,Sitzmann2019,Szeliski1998} make use of a voxel occupancy grid as a low resolution scene representation. The use of a voxel grid for \gls{NVS} is often limited by a lack of structural definition because of the grid resolution.
+
+The four methods can be referred to as classical approaches and present limitations that can be overcome using neural implicit representations. Implicit differentiable rendering approaches \citeColored{Niemeyer2020,Park2020,Yariv2020,Liu2019,Liu2020b,Park2019,Mildenhall2020} uses a differentiable formulation of the rendering pipeline such as rasterization to perform optimization in image space. Such an approach requires accurate geometry masks and cannot handle thin, transparent, or semi-transparent objects. In contrast, the use of volume rendering in conjunction with \gls{SDF} \citeColored{Liu2020b,Park2019,Chibane2020} or \gls{NeRF} \citeColored{Mildenhall2020} to represent the scene content does not require the use of any object mask. Alpha blending enables these methods to recover thin, transparent, and semi-transparent geometry.
+
+Neural implicit representations and volumetric rendering are responsible for current state-of-the-art advances in geometric \gls{CV} tasks such as 3D shape reconstruction, generation \citeColored{Jain2021,Jang2021,Saito2019}, scene relighting \citeColored{Srinivasan2021,Boss2021,Zhang2021b,Rudnev2021}, object, human and camera pose estimation \citeColored{Guo2021,Yen2020,Su2021}, and more.
+
+\paragraph{Training Stability}
+
+Applications of \gls{NeRF} in recent contributions have exposed limitations of the vanilla implementation.
+
+\gls{NeRF}'s internal neural networks are sensible to initialization and may suffer from instabilities when training on certain scenes. In their work \citeColored{Tancik2021}, Tancik et al. proposes the use of a meta-learning scheme called Reptile \citeColored{Nichol2018} to learn better initializations. Mip-NeRF \citeColored{Barron2021} introduced the use of unusual activation functions such as a shifted version of sotfplus and a widened version of sigmoid to avoid common failure modes of \gls{NeRF} and yield smoother optimizations.
+
+\paragraph{Fast Rendering}
+
+The vanilla implementation of \gls{NeRF} is not suited for real-time applications. In follow-up works, acceleration structures and optimization tricks are used to reduce inference and render time up to real-time usage.
+
+DeRF \citeColored{Rebain2021} splits the scene volume into different sections for which a specific \gls{NeRF} subnetwork is trained on. Similarly, KiloNeRF \citeColored{Reiser2021} trains thousands of tiny \gls{MLP} on bounded regions of the scene.
+
+Neural sparse voxel fields \citeColored{Liu2020} use a sparse voxel grid fitted onto the scene geometry to compute ray voxel intersection and avoid sampling empty volume. Hedman et al. \citeColored{Hedman2021} also use the same acceleration structure in combination with differed rendering to accelerate rendering performances. Yu et al. \citeColored{Yu2021} propose to build a plenoptic octree fitted on to the scene content and uses spherical harmonics to encode the scene appearance.
+
+DONeRF \citeColored{Neff2021} relies on a end-to-end trained depth oracle to predict surface location. The number of samples per ray is then chosen accordingly to this prediction to reduce evaluations associated with empty space.
+
+\paragraph{Extended Applications}
+
+Since publication, \gls{NeRF} has been adapted to a multitude of use cases.
+
+NerF++ \citeColored{Zhang2020} extends its applications to 360 capture of large-scale unbounded scenes, NeR-W \citeColored{Martin2021} to in the wild monument photgraphies, NeRF in the Dark \citeColored{Mildenhall2021} to high dynamic range using noisy raw images. Others have applies \gls{NeRF} to text-guided generation \citeColored{Jain2021}, free view realistic facial animation \citeColored{Athar2021}, and controllable human appearance and pose articulations \citeColored{Su2021}.
+
+Each of these contributions suffers from \gls{NeRF}'s vanilla limitations. Faster training, inference, and rendering time would extend their usage to real-time applications.
+
+% =============================================
+\glsresetall
+\section{Background}
+
+\paragraph{Geomertry Representation}
+
+\gls{NeRF} encodes a scene content given multiple views into a neural network $f_{\theta}$ with parameters $\theta$. The network takes a 5D input vector $(x,y,z,\theta,\phi)$ composed of a 3D position vector and view direction to encode view dependant visual properties such as reflection and specularity. Both position and direction vectors are encoded using a deterministic positional encoding $\phi$ to recover high-frequency details as expressed in a follow-up work by the authors \citeColored{Tancik2020}. \gls{NeRF}'s internal neural network is a simple yet $8$ layers deep and $512$ neurons wide \gls{MLP}. A complete depicture of the architecture is shown in Figure \ref{fig:architectures}.
+
+\paragraph{Volume Rendering}
+
+\gls{NeRF} uses classical volume rendering with alpha blending to render a frame. Rays are shot from the camera origin toward each pixel's center. To this end, $64$ positions and directions are uniformly sampled along the rays. This first evaluation is referred to as the coarse step and is part of the hierarchical sampling scheme used by Midenhall et al \cite{Mildenhall2020}. Each sample $x_i$ is then evaluated by the coarse network $f_c$ to output a color $c_i$ and a density $\sigma_i$.
+
+\begin{equation}
+    (c_i, \sigma_i) = f_{\theta}(x_i, d), \;\; 1 \leq i \leq 64
+\end{equation}
+
+All colors along a ray are composed using alpha blending to output the pixel color $\hat{c}_c$.
+
+\begin{gather}
+    \hat{c} = \sum_{i=1}^{64} T_i \alpha_i c_i \label{2} \\
+    T_i = \prod_{j=1}^{i-1} 1 - \alpha_j       \label{3} \\
+    \alpha_i = 1 - exp(\sigma_i \delta_i)      \label{4}
+\end{gather}
+
+Where $T$ is the transmittance and $\delta$ the distance between adjacent sample positions $\delta_i = || x_{i+1} - x_i ||$. This accumulation of transmittance is finally used for a second pass, referred to as the fine step. A probability density function is computed from the coarse evaluation and used to sample $64$ new samples that are more likely to be close to the scene geometry. A second network, the fine network $f_f$ is then used to evaluate both coarse and fine samples to obtain a refined evaluation of the final pixel color $\hat{c}_f$.
+
+In total $(64 + 128) \times W \times H$ network evaluations are performed for the generation of one frame, thus roughly $122M$ evaluations if we consider a $800 \times 800$ image. Only the fine network is kept for inference.
+
+\paragraph{Optimization}
+
+\gls{NeRF} optimizes its coarse and fine networks in an end-to-end fashion by computing an $L_2$ difference in image space against ground truth.
+
+\begin{equation}
+    \mathcal{L} = \frac{1}{P} \sum_{p=1}^{P} (|| c_p - \hat{c}_{cp} ||_2 + || c_p - \hat{c}_{fp} ||_2 )
+\end{equation}
+
+% =============================================
+\begin{table*}[ht]
+    \centering
+    \begin{tabular*}{\textwidth}{l @{\extracolsep{\fill}} rrrrrr}
+        \toprule
+        \textbf{Architecture} &
+        \textbf{Training (h:m:s)} $\downarrow$ &
+        \textbf{Rendering (FPS)} $\uparrow$ &
+        \textbf{MSE} $\downarrow$ &
+        \textbf{PSNR} $\uparrow$ &
+        \textbf{SSIM} $\uparrow$ &
+        \textbf{Size (MB)} $\downarrow$ \\
+        \midrule
+        NeRF             & \textbf{02:44:58} &         0.28  &         1.24e-03  &         30.01  &         0.94  &         2.38  \\
+        ReptileNeRF      &         03:59:56  &         0.28  & \textbf{1.15e-03} &         30.90  & \textbf{0.95} &         2.38  \\
+        DistillNeRF      &         03:02:49  &         0.28  &         1.17e-03  & \textbf{31.02} & \textbf{0.95} &         2.38  \\
+        \midrule
+        TinyNeRF         & \textbf{01:08:40} &         0.94  &         2.15e-03  &         26.37  &         0.91  &         0.37  \\
+        ReptileTinyNeRF  &         01:35:57  &         0.94  & \textbf{1.96e-03} &         28.29  &         0.91  &         0.37  \\
+        DistillTinyNeRF  &         01:25:46  &         0.94  &         1.98e-03  & \textbf{28.39} & \textbf{0.92} &         0.37  \\
+        \midrule
+        MicroNeRF        & \textbf{00:39:51} &         1.71  &         2.98e-03  &         24.09  &         0.87  &         0.10  \\
+        ReptileMicroNeRF &         00:52:24  &         1.71  &         2.80e-03  &         26.51  &         0.88  &         0.10  \\
+        DistillMicroNeRF &         00:56:55  &         1.71  & \textbf{2.63e-03} & \textbf{26.82} & \textbf{0.89} &         0.10  \\
+        \midrule
+        NanoNeRF         & \textbf{00:32:27} & \textbf{2.16} &         3.97e-03  &         23.45  &         0.85  & \textbf{0.03} \\
+        ReptileNanoNeRF  &         00:40:56  & \textbf{2.16} &         3.87e-03  &         25.01  &         0.85  & \textbf{0.03} \\
+        DistillNanoNeRF  &         00:49:37  & \textbf{2.16} & \textbf{3.53e-03} & \textbf{25.36} & \textbf{0.86} & \textbf{0.03} \\
+        \bottomrule
+    \end{tabular*}
+    \caption{Blender Dataset Mean}
+    \label{tab:results}
+\end{table*}
+
+% =============================================
+\glsresetall
+\section{Method}
+
+Our method DistillNeRF, aims at breeding smaller capacity \gls{MLP} from pretrained \gls{NeRF} models. When compressing the size of a model, it has become common practice to think of \gls{KD}.
+
+\gls{KD} consists in transferring the knowledge captured by the weights of a large capacity neural network called the teacher to a smaller capacity network called the student. Contrary to a standard supervised learning framework where the network is trained on a limited and predetermined dataset, \gls{KD} uses the teacher network to generate unseen labels called teacher examples. The student is then trained to match the teacher output distribution. The quality of students produced by such a process depends on the teacher examples' quality.
+
+In this section, we describe how to reduce \gls{NeRF} training time to produce a teacher faster, how to generate student candidates, how to apply \gls{KD} to these candidates, and how to select good teacher examples.
+
+\subsection{Teacher Training}
+
+Our teacher follows the same architecture as the vanilla implementation of \gls{NeRF} but uses the modified activations proposed by the authors in a follow-up paper \citeColored{Barron2021}. The softplus is replaced by a shifted version $log(1+exp(x-1))$, and the sigmoid is widened $(1+2\epsilon)/(1+exp(-x))-\epsilon$ with $\epsilon=0.001$. We initialize the weights of the teacher using the Reptile meta-learning approach proposed by Tancik et al \citeColored{Tancik2020}.
+
+Contrary to the original work, we train the same network for both the coarse and fine steps. It allows us to reduce the number of network evaluations from $192$ per pixel to $128$ and memory usage by half making the training of the teacher network faster and less resource intensive.
+
+\subsection{Student Architecture}
+
+The architecture of \gls{NeRF} internal neural network is a simple \gls{MLP}. Reducing its inference time requires either a reduction of capacity, the number of parameters $\theta$, or the use of faster operation routes in the network graph.
+
+DistillNeRF generates student networks by reducing three parameters: the \gls{MLP} width and depth, and an eventual residual connection. Following these steps, we propose three new flavors of \gls{NeRF} to provide different \gls{LOD} for different needs in computational resources: TinyNeRF, MicroNeRF, and NanoNeRF in decreasing order of width and depth. The detailed parameters used for the three architectures are displayed in Table \ref{tab:architectures}. The parameters are chosen to represent a wide range of student variations.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lrrc}
+        \toprule
+        \textbf{Architecture} & \textbf{Width} & \textbf{Depth} & \textbf{Residual} \\
+        \midrule
+        NeRF      & 256 & 8 & \checkmark \\
+        TinyNeRF  & 128 & 4 & \checkmark \\
+        MicroNeRF &  64 & 4 & $\times$   \\
+        NanoNeRF  &  32 & 2 & $\times$   \\
+        \bottomrule
+    \end{tabular}
+    \caption{Architectures table}
+    \label{tab:architectures}
+\end{table}
+
+\subsection{Knowledge Distillation}
+
+The student candidates are train using \gls{KD}. Their final weights are distilled from the pretrained teacher \gls{NeRF}. The teacher examples used to train the students are randomly sampled from a \gls{BBox} centered on the scene geometry. The \gls{BBox} is described by a set of $6$ parameters, $2$ for each axis: $(B_{left}, B_{right})$ for the $\text{x-axis}$, $(B_{bottom}, B_{top})$ for $\text{y-axis}$, and  $(B_{back}, B_{front})$ for the $\text{z-axis}$. A random position vector and direction are then sampled inside the \gls{BBox}.
+
+The students are then trained to match the teacher's prediction. We optimize the students' parameters to minimize a mixture of $L_2$ for color and density predictions. Instead of using the models' raw density output $\sigma$, we compute the alpha value $\alpha$ using a $\delta = 0.03125$ close to the value encountered during teacher training. As stated by Reiser et al. in KiloNeRF \citeColored{Reiser2021}, it allows reducing the emphasis on small differences between big density values.
+
+\begin{equation}
+    \mathcal{L}_{KD} = \frac{1}{2} (||\hat{c}_t - \hat{c_s}||_2 + ||\hat{\alpha}_t - \hat{\alpha_s}||_2)
+\end{equation}
+
+\subsection{Priority Voxel Grid}
+
+\gls{NeRF} learns to handle empty space in the early stages of training. Thus we optimize the data-efficiency of the distillation process by building a priority voxel grid to emphasize non-empty space, where the content of the scene is more likely to be.
+
+To this end, we first refine the \gls{BBox} to make it fit the bounds of the scene geometry more tightly. The \gls{BBox} is turned into a voxel grid of $64$ bins for each axis. Each voxel is then filled with a $32$ samples Monte Carlo approximation of the mean density $\sigma$ evaluated by the teacher network. We then normalize the voxel grid to values between $0$ and $1$. At this stage, the 3D grid cells contain a score describing its occupancy probability. The \gls{BBox} is finally tightened to the closest cell with a value greater or equal to a selected threshold $\tau = 0.2$.
+
+The same process is used to generate a refined low-resolution occupancy voxel grid with $16$ bins on each axis. Empty cells are assigned with a probability $p_{empty} = 0.2$ to avoid forgetting the empty space captured by the student during the distillation process. The 3D cells are normalized to form the probability distribution from which the teacher examples are sampled during \gls{KD}. The position vectors are generated by drawing a random cell position $(x_c, y_c, z_c)$ and applying a random offset $(x_o, y_o, z_o)$ inside the cells' boundary $(w_c, h_c, d_c)$. The normalized direction vectors are sampled from a unit sphere.
+
+\begin{equation}
+    \vec{x} = 
+    \begin{pmatrix} x \\ y \\ z \\ \end{pmatrix} =
+    \begin{pmatrix} x_c + x_o \\ y_c + y_o \\ z_c + z_o \\ \end{pmatrix}
+    \;\; \text{where} \;\; \begin{pmatrix} x_o \\ y_o \\ z_o \\ \end{pmatrix}
+    \sim  \begin{pmatrix} U(0, w_c) \\ U(0, h_c) \\ U(0, d_c) \\ \end{pmatrix}
+\end{equation}
+
+% =============================================
+\section{Implementation}
+
+\begin{itemize}
+    \item Custom Cuda Kernels 
+    \item Ray Shooting: Ray Generation, Ray Sampling
+    \item Volume Rendering: Alpha Computation, Alpha Blending
+    \item LibTorch for Inference
+    \item Pre-allocation Cuda Memory (All on Device)
+    \item Bind Alpha Blending Output to OpenGL Texture
+    \item Limiting RAM to VRAM memory transfers to minimum
+\end{itemize}
+
+% =============================================
+\section{Experimental Evaluation}
+
+\paragraph{Data}
+
+\begin{itemize}
+    \item Synthetic Blender Dataset (800x800)
+    \item 100 views for training, 100 for validation, 200 for test
+    \item Ray Traced random view Sample on Hemisphere Surface
+    \item with View Direction Targeting the Center
+    \item 8 scenes (chair, drums, ficus, hotdog, lego, materials, mic, ship)
+\end{itemize}
+
+\paragraph{Metrics}
+
+\begin{itemize}
+    \item Peak Signal to Noise Ratio PSNR (Upper Better)
+    \item mesure image distortion and work at pixel level
+    \item Structural Similarity SSIM (Upper Better)
+    \item Similarity Measure work at multiple window scales
+    \item Perceptual Similarity LPIPS (Lower Better)
+    \item Uses Deep Features as a Perceptual Metric
+    \item Training Time (Reptile + Train for Teacher | Knowledge Distillation for Students)
+    \item Render Time (Ray Shooting + Inference + Volume Rendering)
+    \item Models Weight (Not Alone in Real Applications)
+\end{itemize}
+
+\paragraph{Baseline}
+
+\begin{itemize}
+    \item KD against Reptile + Train
+    \item NeRF is baseline
+    \item Results are Mean of the Scenes
+\end{itemize}
+
+\paragraph{Training}
+
+\begin{itemize}
+    \item 64 coarse + 64 Fine
+    \item Reptile: SGD $5e-2$, for $1$ epoch, $16$ Samples
+    \item Train: Adam $5e-4$, for $16$ epochs
+    \item Knowledge Distillation: Adam $5e-4$, for $50,000$ Steps
+    \item Half Precision Training for all
+\end{itemize}
+
+\paragraph{Measurements}
+
+\begin{itemize}
+    \item NVidia RTX 3090 24Go
+    \item 32 Go RAM DDR4
+    \item AMD Ryzen 9 5900X 12-Core Processor
+\end{itemize}
+
+% =============================================
+\section{Results}
+
+\paragraph{Ablation}
+
+% =============================================
+\section{Discussion and Future Work}
+
+% =============================================
+\section{Conclusion}
+
+% DO NOT INCLUDE ACKNOWLEDGMENTS IN AN ANONYMOUS SUBMISSION TO SIGGRAPH 2019
+%\begin{acks}
+%\end{acks}
+
+% Bibliography
+\newpage
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{bibliography}
+
+% Appendix
+% \appendix

@@ -1,0 +1,237 @@
+% Updated in February 2016 by Hwann-Tzong Chen
+% Updated in May 2014 by Hideo Saito
+% Updated in March 2012 by Yasuyuki Matsushita
+% Updated in April 2002 by Antje Endemann, ...., and in March 2010 by Reinhard Klette
+% Based on CVPR 07 and LNCS style, with modifications by DAF, AZ and elle 2008, AA 2010, ACCV 2010
+
+\documentclass[runningheads]{llncs}
+% \usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{ruler}
+\usepackage{color}
+
+%===========================================================
+\usepackage[acronyms]{glossaries}
+\usepackage{booktabs}
+\usepackage{xcolor,colortbl}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\definecolor{Gray}{gray}{0.90}
+
+\newacronym{NVS}{NVS}{Novel View Synthesis}
+\newacronym{NeRF}{NeRF}{Neural Radiance Fields}
+\newacronym{KD}{KD}{Knowledge Distillation}
+\newacronym{MLP}{MLP}{Multi Layer Perceptron}
+\newacronym{LOD}{LOD}{Level of Detail}
+\newacronym{VR}{VR}{Virtual Reality}
+\newacronym{AR}{AR}{Augmented Reality}
+\newacronym{CG}{CG}{Computer Graphics}
+\newacronym{CV}{CV}{Computer Vision}
+\newacronym{SfM}{SfM}{Structure from Motion}
+\newacronym{MPI}{MPI}{Multi-Plane Images}
+\newacronym{SDF}{SDF}{Signed Distance Fields}
+\newacronym{BBox}{BBox}{Bounding Box}
+\newacronym{FPS}{FPS}{Frames per Second}
+\newacronym{HDR}{HDR}{High Dynamic Range}
+
+%===========================================================
+\begin{document}
+\pagestyle{headings}
+\mainmatter
+
+\def\ACCV22SubNumber{***}  % Insert your submission number here
+
+%===========================================================
+\title{DistillNeRF: Data-Efficient Initialization of Neural Radiance Fields using Knowledge Distillation}
+\titlerunning{ACCV-22 submission ID \ACCV22SubNumber}
+\authorrunning{ACCV-22 submission ID \ACCV22SubNumber}
+
+\author{Anonymous ACCV 2022 submission}
+\institute{Paper ID \ACCV22SubNumber}
+
+\maketitle
+
+%===========================================================
+\begin{abstract}
+\end{abstract}
+
+%===========================================================
+\begin{figure}
+  \centering
+  \includegraphics[width=120mm]{imgs/teaser.png}
+  \caption{Teaser Figure to sell the paper.}
+  \label{fig:teaser}
+\end{figure}
+
+%===========================================================
+\section{Introduction}
+
+%===========================================================
+\section{Related Work}
+
+\paragraph{\textbf{Novel View Synthesis.}}
+
+\gls{CG} methods are defined as the set of formulations used to represent a scene geometry and rendering technics used to generate their image representation. As such, \gls{NVS} methods are caegorized by these criterions.
+
+Mesh~\cite{Buehler2001,Debevec1996,Waechter2014,Wood2000} and Point-Cloud~\cite{Aliev2020,Riegler2020,Schonberger2016,Song2020} methods relies on preprocessing steps such as \gls{SfM} or RGB-D sensors to reconstruct the scene geometry from a set of multiview images. \gls{MPI} approaches~\cite{Flynn2019,Mildenhall2019,Srinivasan2020,Zhou2018} represents the scene as a stack of image layers allowing high quality renders in low range viewpoint displacements. Voxel-based pipelines~\cite{Kutulakos1999,Lombardi2019,Penner2017,Seitz1997,Sitzmann2019,Szeliski1998} make use of a voxel occupancy grid as a low resolution scene representation. The use of voxels for \gls{NVS} is often limited by the lack of structural definition due to a lack of resolution.
+
+These four methods are often referred to as classical frameworks and present limitations that neural implicit representation can eleviate. Implicit differentiable rendering methods~\cite{Liu2019,Mildenhall2020,Niemeyer2020,Park2019,Park2020,Yariv2020} performs optimization in the image space by formulating the rendering pipeline as a differentiable rasterization process. Such approches require accruate geometry masks and cannot handle thin, transparent nor semi-transparent objects. In contrast, the use of differentiable volumetric rendering in conjunction with \gls{SDF}~\cite{Chibane2020,Liu2020b,Park2019} or \gls{NeRF}~\cite{Mildenhall2020} to represent the scene geometry does not require the use of any mask and is able handle such complex objects. The use of Alpha-Blending enable those methods to recover thin, transparent, and semi-transparent materials.
+
+Neural implicit representations and volumetric rendering are at the core of the current state of the art in geometric \gls{CV} taks such as 3D shape reconstruction~\cite{Jain2021,Jang2021,Saito2019}, scene relighting~\cite{Boss2021,Rudnev2021,Srinivasan2021,Zhang2021b}, object, human, and camera pose estimation~\cite{Guo2021,Su2021,Yen2020}, and more.
+
+\paragraph{\textbf{Training Stability.}}
+
+Recent contributions and application of \gls{NeRF} have exposed the limitations of its vanilla implementation.
+
+The \gls{NeRF} internal neural network is sensible to initialization and may suffer from instabilities during training on certain scenes resulting in exploding or vanishing values. In their work~\cite{Tancik2021}, Tancik et al. proposed the use of a meta learning approach called Reptile~\cite{Nichol2018} to learn better initializations.
+
+In Mip-NeRF~\cite{Barron2021}, Barron et al. not only present a ray casting formulation to reduce aliasing when the camera position differs from the dataset but also propose a set of stabilization tricks. They replace the softplus activation with a shifted one, the sigmoid activation a widened one to avoid common failure modes and yield smoother optimizations.
+
+\paragraph{\textbf{Fast Rendering.}}
+
+Vanilla \gls{NeRF} is not suited for realtime application ($60$ \gls{FPS}). In follow up works, acceleration structures and optimization tricks are used to reduce inference and accelerate rendering.
+
+DeRF~\cite{Rebain2021} splits the scene volume into sections for which a specific \gls{NeRF} sub network is trained on. Similarly, KiloNeRF~\cite{Reiser2021} pushes the concept further by training thousands of tiny \gls{MLP} on bounded regions of the scene.
+
+Neural sparse voxel fileds~\cite{Liu2020} uses a sparse voxel grid fitted to the scene geometry to cache and compute ray voxel intersections thus avoid sampling empty volumes. Hadman et al.~\cite{Hedman2021} propose a similar apporach by baking the \gls{NeRF} model into an accelration structure in combination with the use of differed rendering to accelerate the rendering performances. Yu et al.~\cite{Yu2021} build a plenoptic octree fitted onto the scene content and uses spherical harmonics decompositon to encode the scene appearance.
+
+DONeRF~\cite{Neff2021} trains a depth oracle in an end to end framework with the \gls{NeRF} model to predict the surface location when raycasting. The number of sample per ray is then chosen accordingly to this prediction to reduce the amount of evaluation associated with empty space.
+
+\paragraph{\textbf{Extended Applications.}}
+
+Since publication, \gls{NeRF} has gained attraction in the field of 3D scene reconstruction and \gls{NVS}, and has been adapted to a multitude of usecases.
+
+NeRF++~\cite{Zhang2020} extends its applications to $360$ captures of large-scale unbounded scenes, NeRF-W~\cite{Martin2021} to in the wild monument photographies, and \gls{NeRF} in the Dark to \gls{HDR} using noisy raw images. Others have appplied \gls{NeRF} to text guided generation~\cite{Jain2021}, free view realistic facial animation~\cite{Athar2021} and controllable human apearance and pose articulations~\cite{Su2021}.
+
+Each of these contributions inheritly suffers from \gls{NeRF} vanilla formulation. Faster training and inference, and stability would extend their usage to real world and realtime applications. 
+
+%===========================================================
+% \begin{tikzpicture}[
+%   roundnode/.style={circle, draw=green!60, fill=green!5, very thick, minimum size=7mm},
+%   squarednode/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=5mm},
+% ]
+%   %Nodes
+%   \node[squarednode]      (maintopic)                              {2};
+%   \node[roundnode]        (uppercircle)       [above=of maintopic] {1};
+%   \node[squarednode]      (rightsquare)       [right=of maintopic] {3};
+%   \node[roundnode]        (lowercircle)       [below=of maintopic] {4};
+  
+%   %Lines
+%   \draw[->] (uppercircle.south) -- (maintopic.north);
+%   \draw[->] (maintopic.east) -- (rightsquare.west);
+%   \draw[->] (rightsquare.south) .. controls +(down:7mm) and +(right:7mm) .. (lowercircle.east);
+% \end{tikzpicture}
+
+\begin{figure}
+  \centering
+  \caption{Schematic of the \gls{NeRF} internal \gls{MLP} architecture. The first section of the network is in charge of learning valuable feature representations of the scene content given an positional encoded position vector $\gamma(x)$ with residual connections. These features are then used to regress a density value $\sigma$ and a radiosity color $c$ given a poisitional encoded view direction $\gamma(d)$.}
+  \label{fig:architecture}
+\end{figure}
+
+%===========================================================
+\section{Background}
+
+\paragraph{\textbf{Geometry Representation.}}
+\gls{NeRF} encodes a scene content given multiple views into a neural network parametetrized by $\theta$, $f_{\theta}$. The network takes a 5D input vectore $(x, y, z, \theta, \phi)$ composed of a 3D position vector and a view direction to encode view dependant visual properties such as reflection and specularity. Both the position and view direction are encoded using a deterministic poisitional encoding $\gamma$ to recover high frequency details as demonstrated in a follow up work by the authors~\cite{Tancik2020}. \gls{NeRF}'s internal neural network is a simple $8$ layer deep and $512$ neurons wide \gls{MLP}. A complete depicture of the architecture is show in Figure~\ref{fig:architecture}.
+
+\paragraph{\textbf{Volumetric Rendering.}}
+
+\paragraph{\textbf{Optimization.}}
+
+%===========================================================
+\setlength{\tabcolsep}{6pt}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Models architectures. The width describes the number neurons in each layer of the NeRF internal neural network, the depth represents the number of hidden layers, and residual informs of the presence or not of a residual connection in the model. The models are displayed in descending order of size. Smaller models naturaly demonstrate higher render frame rates. }
+    \label{tab:architectures}
+    \begin{tabular}{lrrcrr}
+      \toprule \noalign{\smallskip}
+        \textbf{Model} &
+        \textbf{Width} &
+        \textbf{Depth} &
+        \textbf{Residual} &
+        \textbf{Render (FPS)} $\downarrow$ &
+        \textbf{Size (MB)} $\downarrow$ \\
+      \noalign{\smallskip} \midrule
+        NeRF             & 256 & 8 & \checkmark &         0.28  &         2.38  \\
+        TinyNeRF         & 128 & 4 & \checkmark &         0.94  &         0.37  \\
+        MicroNeRF        &  64 & 4 &  $\times$  &         1.71  &         0.10  \\
+        NanoNeRF         &  32 & 2 &  $\times$  & \textbf{2.16} & \textbf{0.03} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+\setlength{\tabcolsep}{1.4pt}
+
+%===========================================================
+\begin{figure}
+  \centering
+  \includegraphics[width=120mm]{imgs/irm.png}
+  \caption{Visualization of the occupancy grid slices normalized between $0$ and $1$ for a vanilla NeRF model trained on the Lego scene from the Blender Synthetic Dataset.}
+  \label{fig:irm}
+\end{figure}
+
+%===========================================================
+\section{Proposed Method}
+
+%===========================================================
+\section{Implementation}
+
+%===========================================================
+\setlength{\tabcolsep}{9pt}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Models benchmark on Blender Synthetic Dataset rescaled to the nearest $400\times400$. The results displayed in the table are averaged on the 8 scenes of the dataset. Our apporach, DistillNeRF, hihglighted in \colorbox{Gray}{light gray}, improves the models performances on MSE, PSNR, and SSIM compared to ReptileNeRF for similar training regimes and present lower quality degradation when training smaller models such as TinyNeRF, MicroNeRF, and NanoNeRF. }
+    \label{tab:results}
+    \begin{tabular}{lrrrr}
+      \toprule \noalign{\smallskip}
+        \textbf{Model} &
+        \textbf{Train (h:m:s)} $\downarrow$ &
+        \textbf{MSE} $\downarrow$ &
+        \textbf{PSNR} $\uparrow$ &
+        \textbf{SSIM} $\uparrow$ \\
+      \noalign{\smallskip} \midrule
+        NeRF             & \textbf{02:44:58} &         1.24e-03  &         30.01  &         0.94   \\
+        ReptileNeRF      &         03:59:56  &         1.17e-03  &         30.90  & \textbf{0.95}  \\
+        \rowcolor{Gray}
+        DistillNeRF      &         03:02:49  & \textbf{1.15e-03} & \textbf{31.02} & \textbf{0.95}  \\
+      \midrule
+        TinyNeRF         & \textbf{01:08:40} &         2.15e-03  &         26.37  &         0.91   \\
+        ReptileTinyNeRF  &         01:35:57  &         1.98e-03  &         28.29  &         0.91   \\
+        \rowcolor{Gray}
+        DistillTinyNeRF  &         01:25:46  & \textbf{1.96e-03} & \textbf{28.39} & \textbf{0.92}  \\
+      \midrule
+        MicroNeRF        & \textbf{00:39:51} &         2.98e-03  &         24.09  &         0.87   \\
+        ReptileMicroNeRF &         00:52:24  &         2.80e-03  &         26.51  &         0.88   \\
+        \rowcolor{Gray}
+        DistillMicroNeRF &         00:56:55  & \textbf{2.63e-03} & \textbf{26.82} & \textbf{0.89}  \\
+      \midrule
+        NanoNeRF         & \textbf{00:32:27} &         3.97e-03  &         23.45  &         0.85  \\
+        ReptileNanoNeRF  &         00:40:56  &         3.87e-03  &         25.01  &         0.85  \\
+        \rowcolor{Gray}
+        DistillNanoNeRF  &         00:49:37  & \textbf{3.53e-03} & \textbf{25.36} & \textbf{0.86} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+\setlength{\tabcolsep}{1.4pt}
+  
+%===========================================================
+\section{Experimental Evaluation}
+
+%===========================================================
+\section{Results}
+
+%===========================================================
+\section{Discussion and Future Work}
+
+%===========================================================
+\section{Conclusion}
+
+%===========================================================
+\bibliographystyle{splncs}
+\bibliography{bibliography}
+
+\end{document}
